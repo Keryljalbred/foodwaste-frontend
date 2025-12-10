@@ -1,0 +1,22 @@
+{
+  "name": "FoodWaste Zero",
+  "short_name": "FoodWasteZero",
+  "description": "Réduis le gaspillage alimentaire grâce aux alertes intelligentes.",
+  "start_url": "/",
+  "display": "standalone",
+  "scope": "/",
+  "theme_color": "#05a66b",
+  "background_color": "#ffffff",
+  "icons": [
+    {
+      "src": "/icons/icon-192.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ]
+}
