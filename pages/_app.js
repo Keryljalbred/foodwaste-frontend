@@ -111,15 +111,18 @@ function Navbar() {
 
 function ProtectedShell({ Component, pageProps }) {
   const router = useRouter();
-  const { isAuthenticated, loadingUser } = useAuth();
+  const { isAuthenticated, authReady } = useAuth();
 
+  // Routes publiques accessibles sans login
   const publicRoutes = ["/login", "/", "/register"];
   const isPublic = publicRoutes.includes(router.pathname);
 
-  if (loadingUser) {
+  // Tant que AuthContext n’a pas vérifié le token, on attend
+  if (!authReady) {
     return <div className="app-shell"><div className="app-main">Chargement...</div></div>;
   }
 
+  // Si utilisateur NON connecté et route privée → redirection vers login
   if (!isAuthenticated && !isPublic) {
     if (typeof window !== "undefined") {
       router.push("/login");
@@ -136,6 +139,7 @@ function ProtectedShell({ Component, pageProps }) {
     </div>
   );
 }
+
 
 function MyApp({ Component, pageProps }) {
   useEffect(() => {
