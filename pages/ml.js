@@ -9,7 +9,8 @@ import {
 } from "lucide-react";
 import Loader from "../components/Loader";
 
-const API_BASE = "http://localhost:8000";
+const API_BASE =
+  process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
 export default function MLPage() {
   const { token } = useAuth();

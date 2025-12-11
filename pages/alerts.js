@@ -3,7 +3,8 @@ import { useEffect, useState } from "react";
 import { useAuth } from "../contexts/AuthContext";
 import { AlertTriangle, Clock, XCircle, CheckCircle } from "lucide-react";
 
-const API_BASE = "http://localhost:8000";
+const API_BASE =
+  process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
 export default function AlertsPage() {
   const { token } = useAuth();
