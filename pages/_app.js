@@ -28,6 +28,7 @@ function Navbar() {
     { name: "Prédiction", icon: <BrainCircuit size={18} />, path: "/ml" },
     { name: "Statistiques", icon: <BarChart2 size={18} />, path: "/statistics" },
     { name: "Paramètres", icon: <Settings size={18} />, path: "/settings" },
+    { name: "Ajouter un produit", icon: <Package size={18} />, path: "/add-product" },
   ];
 
   return (
@@ -67,7 +68,6 @@ function Navbar() {
           <LogOut size={18} />
         </button>
 
-        {/* MENU MOBILE */}
         <button
           className="menu-btn"
           onClick={() => setOpenMenu(!openMenu)}
@@ -76,7 +76,6 @@ function Navbar() {
         </button>
       </div>
 
-      {/* MENU MOBILE OVERLAY */}
       {openMenu && (
         <div className="mobile-menu">
           {links.map((link) => (
@@ -113,21 +112,30 @@ function ProtectedShell({ Component, pageProps }) {
   const router = useRouter();
   const { isAuthenticated, authReady } = useAuth();
 
-  // Routes publiques accessibles sans login
-  const publicRoutes = ["/login", "/", "/register"];
+  // Routes publiques seulement
+  const publicRoutes = ["/", "/login", "/register"];
+
   const isPublic = publicRoutes.includes(router.pathname);
 
-  // Tant que AuthContext n’a pas vérifié le token, on attend
+  // ⛔ Ne rien faire tant que le token n’est pas vérifié
   if (!authReady) {
-    return <div className="app-shell"><div className="app-main">Chargement...</div></div>;
+    return (
+      <div className="app-shell">
+        <div className="app-main">Chargement...</div>
+      </div>
+    );
   }
 
-  // Si utilisateur NON connecté et route privée → redirection vers login
+  // 🔐 Utilisateur NON connecté → redirection
   if (!isAuthenticated && !isPublic) {
     if (typeof window !== "undefined") {
       router.push("/login");
     }
-    return <div className="app-shell"><div className="app-main">Redirection...</div></div>;
+    return (
+      <div className="app-shell">
+        <div className="app-main">Redirection...</div>
+      </div>
+    );
   }
 
   return (
@@ -140,23 +148,20 @@ function ProtectedShell({ Component, pageProps }) {
   );
 }
 
-
 function MyApp({ Component, pageProps }) {
   useEffect(() => {
-  if ("serviceWorker" in navigator) {
-    navigator.serviceWorker.register("/service-worker.js")
-      .then(() => console.log("SW enregistré"))
-      .catch(err => console.error("SW erreur :", err));
-  }
-}, []);
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.register("/service-worker.js")
+        .then(() => console.log("SW enregistré"))
+        .catch(err => console.error("SW erreur :", err));
+    }
+  }, []);
+
   return (
     <AuthProvider>
       <ProtectedShell Component={Component} pageProps={pageProps} />
     </AuthProvider>
   );
-
 }
 
 export default MyApp;
-
-
