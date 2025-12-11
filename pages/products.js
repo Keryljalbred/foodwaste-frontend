@@ -133,7 +133,7 @@ export default function ProductsPage() {
 
       <p className="page-subtitle">
         Ajouter un Produit{" "}
-        <a href="add-product" style={{ color: "var(--primary)" }}>
+        <a href="/add-product" style={{ color: "var(--primary)" }}>
           Ajouter
         </a>
       </p>
