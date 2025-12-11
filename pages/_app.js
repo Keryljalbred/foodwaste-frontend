@@ -41,7 +41,7 @@ function Navbar() {
           {links.map((link) => (
             <div
               key={link.path}
-              className={`nav-item ${router.asPath === link.path ? "active" : ""}`}
+              className={`nav-item ${router.pathname === link.path ? "active" : ""}`}
               onClick={() => router.push(link.path)}
             >
               {link.icon}
@@ -53,7 +53,7 @@ function Navbar() {
 
       <div className="nav-right">
         <span className="user-label">
-          {user ? user.full_name || user.email : ""}
+          {user ? user.full_name || user.email : "" }
         </span>
 
         <button
@@ -65,72 +65,32 @@ function Navbar() {
         >
           <LogOut size={18} />
         </button>
-
-        <button className="menu-btn" onClick={() => setOpenMenu(!openMenu)}>
-          <Menu size={22} />
-        </button>
       </div>
-
-      {openMenu && (
-        <div className="mobile-menu">
-          {links.map((link) => (
-            <div
-              key={link.path}
-              className="mobile-item"
-              onClick={() => {
-                setOpenMenu(false);
-                router.push(link.path);
-              }}
-            >
-              {link.icon}
-              <span>{link.name}</span>
-            </div>
-          ))}
-
-          <div
-            className="mobile-item logout-mobile"
-            onClick={() => {
-              logout();
-              router.push("/login");
-            }}
-          >
-            <LogOut size={18} />
-            <span>Déconnexion</span>
-          </div>
-        </div>
-      )}
     </header>
   );
 }
-
 
 function ProtectedShell({ Component, pageProps }) {
   const router = useRouter();
   const { isAuthenticated, authReady } = useAuth();
 
   const publicRoutes = ["/", "/login", "/register"];
+  const currentPath = router.pathname;
 
-  // IMPORTANT : utiliser asPath pour éviter les redirections fantômes
-  const currentPath = router.asPath.split("?")[0];
   const isPublic = publicRoutes.includes(currentPath);
 
+  // 1️⃣ Ne rien faire tant que authReady = false
   if (!authReady) {
-    return (
-      <div className="app-shell">
-        <div className="app-main">Chargement...</div>
-      </div>
-    );
+    return <div className="app-shell"><div className="app-main">Chargement...</div></div>;
   }
 
+  // 2️⃣ Si pas authentifié → redirection uniquement si route privée
   if (!isAuthenticated && !isPublic) {
-    router.push("/login");
-    return (
-      <div className="app-shell">
-        <div className="app-main">Redirection...</div>
-      </div>
-    );
+    router.replace("/login");
+    return <div className="app-shell"><div className="app-main">Redirection...</div></div>;
   }
 
+  // 3️⃣ Si authentifié → PAS DE REDIRECTION
   return (
     <div className="app-shell">
       <Navbar />
@@ -141,16 +101,7 @@ function ProtectedShell({ Component, pageProps }) {
   );
 }
 
-
 function MyApp({ Component, pageProps }) {
-  useEffect(() => {
-    if ("serviceWorker" in navigator) {
-      navigator.serviceWorker.register("/service-worker.js")
-        .then(() => console.log("SW enregistré"))
-        .catch(err => console.error("SW erreur :", err));
-    }
-  }, []);
-
   return (
     <AuthProvider>
       <ProtectedShell Component={Component} pageProps={pageProps} />
