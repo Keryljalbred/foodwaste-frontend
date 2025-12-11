@@ -1,6 +1,7 @@
 // pages/add-product.js
 import { useState, useEffect } from "react";
 import { useAuth } from "../contexts/AuthContext";
+import { useRouter } from "next/router";
 import {
   PackagePlus,
   Calendar,
@@ -13,8 +14,19 @@ const API_BASE =
   process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
   
 export default function AddProductPage() {
-  const { token } = useAuth();
+  const { token, isAuthenticated, authReady } = useAuth();
+  const router = useRouter();
 
+  // 🛑 NE RIEN AFFICHER TANT QUE L’AUTH N’EST PAS PRÊTE
+  if (!authReady) return <p>Chargement...</p>;
+
+  // 🔐 SI PAS CONNECTÉ → LOGIN
+  if (!isAuthenticated) {
+    if (typeof window !== "undefined") router.push("/login");
+    return <p>Redirection...</p>;
+  }
+
+  // 🧠 ICI → l’utilisateur est authentifié → LA PAGE PEUT S’AFFICHER
   const [name, setName] = useState("");
   const [categoryId, setCategoryId] = useState("");
   const [categories, setCategories] = useState([]);
@@ -113,7 +125,7 @@ export default function AddProductPage() {
             </div>
           </label>
 
-          {/* Catégorie (MENU DÉROULANT) */}
+          {/* Catégorie */}
           <label>
             Catégorie
             <div className="input-with-icon">
