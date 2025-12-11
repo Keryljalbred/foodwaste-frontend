@@ -3,27 +3,34 @@ import { createContext, useContext, useEffect, useState } from "react";
 
 const AuthContext = createContext(null);
 
-// 🔥 IMPORTANT : utilise l'API Render en production
+// URL backend
 const API_BASE =
   process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
 export function AuthProvider({ children }) {
   const [token, setToken] = useState(null);
   const [user, setUser] = useState(null);
+
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-  // indique si on a fini le chargement du token
+  // Indique si les vérifications sont FINIES
   const [authReady, setAuthReady] = useState(false);
 
-  // Charger le token depuis localStorage
+  // Charger le token au démarrage
   useEffect(() => {
     const stored = localStorage.getItem("fwz_token");
-    if (stored) setToken(stored);
+
+    if (!stored) {
+      setAuthReady(true);
+      return;
+    }
+
+    setToken(stored);
   }, []);
 
-  // Vérifier si le token est valide
+  // Vérifier le token quand il change
   useEffect(() => {
-    const checkToken = async () => {
+    async function validate() {
       if (!token) {
         setUser(null);
         setIsAuthenticated(false);
@@ -37,6 +44,7 @@ export function AuthProvider({ children }) {
         });
 
         if (!res.ok) {
+          // Token faux → déconnecter proprement
           localStorage.removeItem("fwz_token");
           setToken(null);
           setUser(null);
@@ -45,19 +53,23 @@ export function AuthProvider({ children }) {
           return;
         }
 
+        // Token valide → enregistrer user
         const data = await res.json();
         setUser(data);
         setIsAuthenticated(true);
         setAuthReady(true);
 
-      } catch (e) {
-        console.error("Erreur /me:", e);
+      } catch (err) {
+        console.error("Erreur /me :", err);
+        localStorage.removeItem("fwz_token");
+        setToken(null);
+        setUser(null);
         setIsAuthenticated(false);
         setAuthReady(true);
       }
-    };
+    }
 
-    checkToken();
+    validate();
   }, [token]);
 
   // LOGIN
@@ -69,24 +81,12 @@ export function AuthProvider({ children }) {
 
     const res = await fetch(`${API_BASE}/users/login`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-      },
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
       body: body.toString(),
     });
 
-    if (res.status === 401) {
-      throw { detail: "Identifiants invalides" };
-    }
-
     if (!res.ok) {
-      let err;
-      try {
-        err = await res.json();
-      } catch {
-        err = { detail: "Erreur inconnue" };
-      }
-      throw err;
+      throw { detail: "Identifiants invalides" };
     }
 
     const data = await res.json();
@@ -98,6 +98,7 @@ export function AuthProvider({ children }) {
     return accessToken;
   };
 
+  // LOGOUT
   const logout = () => {
     localStorage.removeItem("fwz_token");
     setToken(null);
@@ -114,7 +115,6 @@ export function AuthProvider({ children }) {
         authReady,
         login,
         logout,
-        refreshUser: () => setToken(localStorage.getItem("fwz_token")),
       }}
     >
       {children}
