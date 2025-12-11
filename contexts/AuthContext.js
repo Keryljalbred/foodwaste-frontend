@@ -2,17 +2,20 @@
 import { createContext, useContext, useEffect, useState } from "react";
 
 const AuthContext = createContext(null);
-const API_BASE = "http://localhost:8000";
+
+// 🔥 IMPORTANT : utilise l'API Render en production
+const API_BASE =
+  process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
 export function AuthProvider({ children }) {
   const [token, setToken] = useState(null);
   const [user, setUser] = useState(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-  // ⬅️ IMPORTANT : indique si on a fini de vérifier le token
+  // indique si on a fini le chargement du token
   const [authReady, setAuthReady] = useState(false);
 
-  // Charger token depuis localStorage au démarrage
+  // Charger le token depuis localStorage
   useEffect(() => {
     const stored = localStorage.getItem("fwz_token");
     if (stored) setToken(stored);
@@ -24,7 +27,7 @@ export function AuthProvider({ children }) {
       if (!token) {
         setUser(null);
         setIsAuthenticated(false);
-        setAuthReady(true);   // ⬅️ même si token vide, on a fini
+        setAuthReady(true);
         return;
       }
 
@@ -34,7 +37,6 @@ export function AuthProvider({ children }) {
         });
 
         if (!res.ok) {
-          // Token invalide
           localStorage.removeItem("fwz_token");
           setToken(null);
           setUser(null);
@@ -58,9 +60,7 @@ export function AuthProvider({ children }) {
     checkToken();
   }, [token]);
 
-  // =========================
-  //      LOGIN
-  // =========================
+  // LOGIN
   const login = async (email, password) => {
     const body = new URLSearchParams();
     body.append("grant_type", "password");
@@ -111,7 +111,7 @@ export function AuthProvider({ children }) {
         token,
         user,
         isAuthenticated,
-        authReady,       // ⬅️ AJOUT ESSENTIEL
+        authReady,
         login,
         logout,
         refreshUser: () => setToken(localStorage.getItem("fwz_token")),
