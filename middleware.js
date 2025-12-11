@@ -1,14 +1,24 @@
-// middleware.js
 import { NextResponse } from "next/server";
 
 export function middleware(request) {
   const { pathname } = request.nextUrl;
 
-  // Le front doit toujours revenir sur "/" après rechargement
-  // sauf pour login et register.
-  const publicRoutes = ["/index", "/"];
+  // 1️⃣ Ignorer tous les fichiers statiques
+  if (
+    pathname.startsWith("/_next") || 
+    pathname.startsWith("/api") ||
+    pathname.startsWith("/icons") ||
+    pathname.startsWith("/manifest.json") ||
+    pathname.startsWith("/service-worker.js") ||
+    pathname.includes(".")
+  ) {
+    return NextResponse.next();
+  }
 
-  // Si ce n'est PAS une route publique -> rediriger vers la page d'accueil
+  // 2️⃣ Routes publiques
+  const publicRoutes = ["/", "/index", "/login", "/register"];
+
+  // 3️⃣ Redirection pour routes non publiques
   if (!publicRoutes.includes(pathname)) {
     const url = request.nextUrl.clone();
     url.pathname = "/";
@@ -18,7 +28,6 @@ export function middleware(request) {
   return NextResponse.next();
 }
 
-// Appliquer le middleware à TOUTES les routes
 export const config = {
   matcher: "/:path*",
 };
