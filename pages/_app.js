@@ -24,11 +24,11 @@ function Navbar() {
   const links = [
     { name: "Dashboard", icon: <Home size={18} />, path: "/dashboard" },
     { name: "Produits", icon: <Package size={18} />, path: "/products" },
+    { name: "Ajouter un produit", icon: <Package size={18} />, path: "/add-product" },
     { name: "Recettes", icon: <ChefHat size={18} />, path: "/recipes" },
     { name: "Prédiction", icon: <BrainCircuit size={18} />, path: "/ml" },
     { name: "Statistiques", icon: <BarChart2 size={18} />, path: "/statistics" },
     { name: "Paramètres", icon: <Settings size={18} />, path: "/settings" },
-    { name: "Ajouter un produit", icon: <Package size={18} />, path: "/add-product" },
   ];
 
   return (
@@ -41,9 +41,7 @@ function Navbar() {
           {links.map((link) => (
             <div
               key={link.path}
-              className={`nav-item ${
-                router.pathname === link.path ? "active" : ""
-              }`}
+              className={`nav-item ${router.asPath === link.path ? "active" : ""}`}
               onClick={() => router.push(link.path)}
             >
               {link.icon}
@@ -68,10 +66,7 @@ function Navbar() {
           <LogOut size={18} />
         </button>
 
-        <button
-          className="menu-btn"
-          onClick={() => setOpenMenu(!openMenu)}
-        >
+        <button className="menu-btn" onClick={() => setOpenMenu(!openMenu)}>
           <Menu size={22} />
         </button>
       </div>
@@ -108,16 +103,17 @@ function Navbar() {
   );
 }
 
+
 function ProtectedShell({ Component, pageProps }) {
   const router = useRouter();
   const { isAuthenticated, authReady } = useAuth();
 
-  // Routes publiques seulement
   const publicRoutes = ["/", "/login", "/register"];
 
-  const isPublic = publicRoutes.includes(router.pathname);
+  // IMPORTANT : utiliser asPath pour éviter les redirections fantômes
+  const currentPath = router.asPath.split("?")[0];
+  const isPublic = publicRoutes.includes(currentPath);
 
-  // ⛔ Ne rien faire tant que le token n’est pas vérifié
   if (!authReady) {
     return (
       <div className="app-shell">
@@ -126,11 +122,8 @@ function ProtectedShell({ Component, pageProps }) {
     );
   }
 
-  // 🔐 Utilisateur NON connecté → redirection
   if (!isAuthenticated && !isPublic) {
-    if (typeof window !== "undefined") {
-      router.push("/login");
-    }
+    router.push("/login");
     return (
       <div className="app-shell">
         <div className="app-main">Redirection...</div>
@@ -147,6 +140,7 @@ function ProtectedShell({ Component, pageProps }) {
     </div>
   );
 }
+
 
 function MyApp({ Component, pageProps }) {
   useEffect(() => {
