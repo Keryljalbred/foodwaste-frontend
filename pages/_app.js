@@ -9,22 +9,20 @@ import {
   BrainCircuit,
   Settings,
   BarChart2,
-  Menu,
   LogOut,
 } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 
 function Navbar() {
   const router = useRouter();
   const { user, logout, isAuthenticated } = useAuth();
-  const [openMenu, setOpenMenu] = useState(false);
+  const [openMenu] = useState(false); // menu retiré
 
   if (!isAuthenticated) return null;
 
   const links = [
     { name: "Dashboard", icon: <Home size={18} />, path: "/dashboard" },
     { name: "Produits", icon: <Package size={18} />, path: "/products" },
-    { name: "Ajouter un produit", icon: <Package size={18} />, path: "/add-product" },
     { name: "Recettes", icon: <ChefHat size={18} />, path: "/recipes" },
     { name: "Prédiction", icon: <BrainCircuit size={18} />, path: "/ml" },
     { name: "Statistiques", icon: <BarChart2 size={18} />, path: "/statistics" },
@@ -37,6 +35,7 @@ function Navbar() {
         <div className="brand" onClick={() => router.push("/dashboard")}>
           FoodWaste Zero
         </div>
+
         <nav className="nav-links">
           {links.map((link) => (
             <div
@@ -53,7 +52,7 @@ function Navbar() {
 
       <div className="nav-right">
         <span className="user-label">
-          {user ? user.full_name || user.email : "" }
+          {user ? user.full_name || user.email : ""}
         </span>
 
         <button
@@ -78,7 +77,7 @@ function ProtectedShell({ Component, pageProps }) {
   const currentPath = router.asPath.split("?")[0];
   const isPublic = publicRoutes.includes(currentPath);
 
-  // 1️⃣ Attendre que AuthContext soit prêt
+  // Attendre Ready
   if (!authReady) {
     return (
       <div className="app-shell">
@@ -87,7 +86,7 @@ function ProtectedShell({ Component, pageProps }) {
     );
   }
 
-  // 2️⃣ Si non connecté → redirection seulement si route privée
+  // Rediriger uniquement si nécessaire
   if (!isAuthenticated && !isPublic) {
     router.replace("/login");
     return null;
@@ -102,7 +101,6 @@ function ProtectedShell({ Component, pageProps }) {
     </div>
   );
 }
-
 
 function MyApp({ Component, pageProps }) {
   return (

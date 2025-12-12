@@ -1,5 +1,4 @@
 // pages/products.js
-// pages/products.js
 import { useEffect, useState } from "react";
 import { useAuth } from "../contexts/AuthContext";
 import { useRouter } from "next/router";
@@ -13,22 +12,30 @@ import {
   Trash2,
 } from "lucide-react";
 
+// ❗ toujours définir API_BASE avant toute logique
+const API_BASE =
+  process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+
+// Désactive SSR (important)
 export const ssr = false;
 
-
 export default function ProductsPage() {
-  const router = useRouter(); 
+  // ❗ hook placé dans le composant → correct
+  const router = useRouter();
   const { token } = useAuth();
+
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState("");
 
+  // ---------- FETCH PRODUCTS ----------
   const fetchProducts = async () => {
     try {
       const res = await fetch(`${API_BASE}/products/`, {
         headers: { Authorization: `Bearer ${token}` },
       });
+
       if (res.ok) {
         const data = await res.json();
         setProducts(data || []);
@@ -46,6 +53,7 @@ export default function ProductsPage() {
     if (token) fetchProducts();
   }, [token]);
 
+  // ---------- FETCH CATEGORIES ----------
   useEffect(() => {
     fetch(`${API_BASE}/categories/`)
       .then((res) => res.json())
@@ -53,7 +61,7 @@ export default function ProductsPage() {
       .catch(() => setCategories([]));
   }, []);
 
-  // ----- ACTIONS -----
+  // ---------- ACTIONS ----------
   const actionCall = async (url) => {
     try {
       await fetch(url, {
@@ -76,7 +84,7 @@ export default function ProductsPage() {
   const wasteProduct = (id) =>
     actionCall(`${API_BASE}/products/${id}/waste`);
 
-  // ----- BADGE -----
+  // ---------- BADGES ----------
   const badge = (days) => {
     if (days < 0)
       return badgeStyle("PÉRIMÉ", "#b91c1c", "#fee2e2", AlertTriangle);
@@ -135,12 +143,15 @@ export default function ProductsPage() {
         Gérez vos produits : consommer, gaspiller et suivre leur état.
       </p>
 
+      {/* ➕ AJOUTER PRODUIT */}
       <p className="page-subtitle">
         Ajouter un Produit{" "}
-        <span onClick={() => router.push("/add-product")} style={{ color: "var(--primary)", cursor: "pointer" }}>
+        <span
+          onClick={() => router.push("/add-product")}
+          style={{ color: "var(--primary)", cursor: "pointer" }}
+        >
           Ajouter
         </span>
-
       </p>
 
       {loading ? (
@@ -150,10 +161,12 @@ export default function ProductsPage() {
           <Package size={40} color="#6b7280" />
           <p style={{ marginTop: 12 }}>
             Aucun produit.{" "}
-            <span onClick={() => router.push("/add-product")} style={{ color: "var(--primary)", cursor: "pointer" }}>
+            <span
+              onClick={() => router.push("/add-product")}
+              style={{ color: "var(--primary)", cursor: "pointer" }}
+            >
               Ajouter
             </span>
-
           </p>
         </div>
       ) : (
@@ -178,10 +191,8 @@ export default function ProductsPage() {
                   display: "flex",
                   flexDirection: "column",
                   justifyContent: "space-between",
-                  animation: "fadeInCard 0.4s ease",
                 }}
               >
-                {/* Nom + catégorie */}
                 <div>
                   <div
                     style={{
@@ -198,7 +209,6 @@ export default function ProductsPage() {
                   </div>
                 </div>
 
-                {/* Quantité + jours */}
                 <div
                   style={{
                     display: "flex",
@@ -217,10 +227,8 @@ export default function ProductsPage() {
                   </span>
                 </div>
 
-                {/* Badge */}
                 <div style={{ marginTop: 10 }}>{badge(p.days_left)}</div>
 
-                {/* Boutons */}
                 <div
                   style={{
                     display: "flex",
