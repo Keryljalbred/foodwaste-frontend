@@ -1,6 +1,8 @@
 // pages/products.js
 import { useEffect, useState } from "react";
 import { useAuth } from "../contexts/AuthContext";
+import { useRouter } from "next/router";
+
 import {
   Package,
   Clock,
@@ -9,6 +11,7 @@ import {
   Utensils,
   Trash2,
 } from "lucide-react";
+const router = useRouter();
 
 const API_BASE =
   process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
@@ -133,9 +136,10 @@ export default function ProductsPage() {
 
       <p className="page-subtitle">
         Ajouter un Produit{" "}
-        <a href="/add-product" style={{ color: "var(--primary)" }}>
+        <span onClick={() => router.push("/add-product")} style={{ color: "var(--primary)", cursor: "pointer" }}>
           Ajouter
-        </a>
+        </span>
+
       </p>
 
       {loading ? (
@@ -145,9 +149,10 @@ export default function ProductsPage() {
           <Package size={40} color="#6b7280" />
           <p style={{ marginTop: 12 }}>
             Aucun produit.{" "}
-            <a href="/add-product" style={{ color: "var(--primary)" }}>
+            <span onClick={() => router.push("/add-product")} style={{ color: "var(--primary)", cursor: "pointer" }}>
               Ajouter
-            </a>
+            </span>
+
           </p>
         </div>
       ) : (
