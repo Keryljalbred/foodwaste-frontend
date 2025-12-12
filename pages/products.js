@@ -1,7 +1,7 @@
 // pages/products.js
 import { useEffect, useState } from "react";
 import { useAuth } from "../contexts/AuthContext";
-import { useRouter } from "next/router";
+import Link from "next/link";
 
 import {
   Package,
@@ -12,16 +12,11 @@ import {
   Trash2,
 } from "lucide-react";
 
-// ❗ toujours définir API_BASE avant toute logique
+// Toujours définir API_BASE avant la logique
 const API_BASE =
   process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
-// Désactive SSR (important)
-export const ssr = false;
-
 export default function ProductsPage() {
-  // ❗ hook placé dans le composant → correct
-  const router = useRouter();
   const { token } = useAuth();
 
   const [products, setProducts] = useState([]);
@@ -143,15 +138,20 @@ export default function ProductsPage() {
         Gérez vos produits : consommer, gaspiller et suivre leur état.
       </p>
 
-      {/* ➕ AJOUTER PRODUIT */}
+      {/* ➕ LIEN AJOUTER PRODUIT → avec Link, plus de onClick */}
       <p className="page-subtitle">
-        Ajouter un Produit{" "}
-        <span
-          onClick={() => router.push("/add-product")}
-          style={{ color: "var(--primary)", cursor: "pointer" }}
+        Ajouter un produit{" "}
+        <Link
+          href="/add-product"
+          style={{
+            color: "var(--primary)",
+            cursor: "pointer",
+            textDecoration: "underline",
+            fontWeight: 600,
+          }}
         >
           Ajouter
-        </span>
+        </Link>
       </p>
 
       {loading ? (
@@ -161,12 +161,17 @@ export default function ProductsPage() {
           <Package size={40} color="#6b7280" />
           <p style={{ marginTop: 12 }}>
             Aucun produit.{" "}
-            <span
-              onClick={() => router.push("/add-product")}
-              style={{ color: "var(--primary)", cursor: "pointer" }}
+            <Link
+              href="/add-product"
+              style={{
+                color: "var(--primary)",
+                cursor: "pointer",
+                textDecoration: "underline",
+                fontWeight: 600,
+              }}
             >
               Ajouter
-            </span>
+            </Link>
           </p>
         </div>
       ) : (
