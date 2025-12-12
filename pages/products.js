@@ -15,6 +15,9 @@ const router = useRouter();
 
 const API_BASE =
   process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+  
+export const ssr = false;
+
 
 export default function ProductsPage() {
   const { token } = useAuth();
