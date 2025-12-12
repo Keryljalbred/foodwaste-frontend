@@ -11,12 +11,10 @@ import {
   BarChart2,
   LogOut,
 } from "lucide-react";
-import { useState } from "react";
 
 function Navbar() {
   const router = useRouter();
   const { user, logout, isAuthenticated } = useAuth();
-  const [openMenu] = useState(false); // menu retiré
 
   if (!isAuthenticated) return null;
 
@@ -51,9 +49,7 @@ function Navbar() {
       </div>
 
       <div className="nav-right">
-        <span className="user-label">
-          {user ? user.full_name || user.email : ""}
-        </span>
+        <span className="user-label">{user?.full_name || user?.email}</span>
 
         <button
           className="logout-btn"
@@ -77,16 +73,8 @@ function ProtectedShell({ Component, pageProps }) {
   const currentPath = router.asPath.split("?")[0];
   const isPublic = publicRoutes.includes(currentPath);
 
-  // Attendre Ready
-  if (!authReady) {
-    return (
-      <div className="app-shell">
-        <div className="app-main">Chargement...</div>
-      </div>
-    );
-  }
+  if (!authReady) return <div className="app-main">Chargement...</div>;
 
-  // Rediriger uniquement si nécessaire
   if (!isAuthenticated && !isPublic) {
     router.replace("/login");
     return null;
@@ -102,12 +90,10 @@ function ProtectedShell({ Component, pageProps }) {
   );
 }
 
-function MyApp({ Component, pageProps }) {
+export default function MyApp({ Component, pageProps }) {
   return (
     <AuthProvider>
       <ProtectedShell Component={Component} pageProps={pageProps} />
     </AuthProvider>
   );
 }
-
-export default MyApp;
