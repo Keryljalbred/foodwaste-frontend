@@ -37,12 +37,19 @@ export default function AddProductPage() {
   const [message, setMessage] = useState(null);
 
   // 🔥 Charger les catégories depuis l’API
-  useEffect(() => {
-    fetch(`${API_BASE}/categories/`)
-      .then((res) => res.json())
-      .then((data) => setCategories(data))
-      .catch(() => setCategories([]));
-  }, []);
+useEffect(() => {
+  if (!token) return;
+
+  fetch(`${API_BASE}/categories/`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  })
+    .then((res) => res.json())
+    .then((data) => setCategories(data))
+    .catch(() => setCategories([]));
+}, [token]);
+
 
   // 🔥 Soumission du formulaire
   const handleSubmit = async (e) => {
