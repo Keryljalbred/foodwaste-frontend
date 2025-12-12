@@ -74,7 +74,8 @@ function ProtectedShell({ Component, pageProps }) {
   const router = useRouter();
   const { isAuthenticated, authReady } = useAuth();
 
-  const publicRoutes = ["/", "/login", "/register"];
+  const publicRoutes = ["/", "/login", "/register", "/add-product"];
+
   const currentPath = router.asPath.split("?")[0];
   const isPublic = publicRoutes.includes(currentPath);
 

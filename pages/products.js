@@ -1,36 +1,54 @@
-// pages/add-product.js
-import { useState, useEffect } from "react";
+// pages/products.js
+import { useEffect, useState } from "react";
 import { useAuth } from "../contexts/AuthContext";
-import { useRouter } from "next/router";
-import { PackagePlus, Layers, Calendar, Edit3 } from "lucide-react";
+import Link from "next/link";
 
-// ALWAYS DISABLE SSR ON RENDER
-export const ssr = false;
+import {
+  Package,
+  Clock,
+  AlertTriangle,
+  CheckCircle2,
+  Utensils,
+  Trash2,
+} from "lucide-react";
 
+// Toujours définir API_BASE avant la logique
 const API_BASE =
   process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
-export default function AddProductPage() {
-  const router = useRouter();
-  const { token, isAuthenticated, authReady } = useAuth();
+export default function ProductsPage() {
+  const { token } = useAuth();
 
-  const [name, setName] = useState("");
-  const [quantity, setQuantity] = useState(1);
-  const [expirationDate, setExpirationDate] = useState("");
-  const [categoryId, setCategoryId] = useState("");
-  const [notes, setNotes] = useState("");
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [categories, setCategories] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState("");
 
-  const [msg, setMsg] = useState(null);
+  // ---------- FETCH PRODUCTS ----------
+  const fetchProducts = async () => {
+    try {
+      const res = await fetch(`${API_BASE}/products/`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
 
-  // Attendre le contexte d'auth
-  useEffect(() => {
-    if (authReady && !isAuthenticated) {
-      router.push("/login");
+      if (res.ok) {
+        const data = await res.json();
+        setProducts(data || []);
+      } else {
+        console.error("Error products", await res.text());
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
     }
-  }, [authReady, isAuthenticated]);
+  };
 
-  // Charger catégories
+  useEffect(() => {
+    if (token) fetchProducts();
+  }, [token]);
+
+  // ---------- FETCH CATEGORIES ----------
   useEffect(() => {
     fetch(`${API_BASE}/categories/`)
       .then((res) => res.json())
@@ -38,147 +56,224 @@ export default function AddProductPage() {
       .catch(() => setCategories([]));
   }, []);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setMsg(null);
-
-    if (!name.trim()) {
-      setMsg({ type: "error", text: "Le nom est obligatoire." });
-      return;
-    }
-
-    const payload = {
-      name,
-      quantity: Number(quantity),
-      expiration_date: expirationDate,
-      notes: notes || null,
-      category_id: categoryId ? Number(categoryId) : null,
-    };
-
+  // ---------- ACTIONS ----------
+  const actionCall = async (url) => {
     try {
-      const res = await fetch(`${API_BASE}/products/`, {
+      await fetch(url, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify(payload),
+        body: JSON.stringify({ amount: 1 }),
       });
-
-      if (res.ok || res.status === 201) {
-        setMsg({ type: "success", text: "Produit ajouté !" });
-
-        // Reset formulaire
-        setName("");
-        setQuantity(1);
-        setExpirationDate("");
-        setCategoryId("");
-        setNotes("");
-
-        // Redirection légère après 1 sec
-        setTimeout(() => router.push("/products"), 800);
-      } else {
-        setMsg({ type: "error", text: await res.text() });
-      }
+      fetchProducts();
     } catch (err) {
-      setMsg({ type: "error", text: "Erreur lors de l'ajout." });
+      console.error(err);
     }
   };
 
+  const consumeProduct = (id) =>
+    actionCall(`${API_BASE}/products/${id}/consume`);
+
+  const wasteProduct = (id) =>
+    actionCall(`${API_BASE}/products/${id}/waste`);
+
+  // ---------- BADGES ----------
+  const badge = (days) => {
+    if (days < 0)
+      return badgeStyle("PÉRIMÉ", "#b91c1c", "#fee2e2", AlertTriangle);
+    if (days <= 1)
+      return badgeStyle("URGENT", "#c05621", "#fff7ed", Clock);
+    if (days <= 3)
+      return badgeStyle("À SURVEILLER", "#d97706", "#fffbeb", Clock);
+    return badgeStyle("OK", "#166534", "#dcfce7", CheckCircle2);
+  };
+
+  const badgeStyle = (text, color, bg, Icon) => (
+    <span
+      style={{
+        display: "inline-flex",
+        alignItems: "center",
+        gap: 5,
+        padding: "4px 12px",
+        borderRadius: 999,
+        fontSize: 12,
+        fontWeight: 600,
+        backgroundColor: bg,
+        color,
+      }}
+    >
+      <Icon size={13} />
+      {text}
+    </span>
+  );
+
   return (
-    <div className="page">
-      <h1 className="page-title">Ajouter un produit</h1>
+    <>
+      <h1 className="page-title">Mes produits</h1>
 
-      <div className="card" style={{ maxWidth: 600, margin: "0 auto" }}>
-        <form onSubmit={handleSubmit}>
-          {/* Nom */}
-          <label>
-            Nom du produit
-            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-              <PackagePlus size={18} color="var(--primary)" />
-              <input
-                type="text"
-                placeholder="Ex : Yaourt nature"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-              />
-            </div>
-          </label>
+      {/* FILTRE CATÉGORIES */}
+      <div style={{ maxWidth: 300, marginBottom: 20 }}>
+        <select
+          value={selectedCategory}
+          onChange={(e) => setSelectedCategory(e.target.value)}
+          style={{
+            width: "100%",
+            padding: "10px",
+            borderRadius: 8,
+            border: "1px solid #d1d5db",
+          }}
+        >
+          <option value="">Toutes les catégories</option>
+          {categories.map((c) => (
+            <option key={c.id} value={c.name}>
+              {c.name}
+            </option>
+          ))}
+        </select>
+      </div>
 
-          {/* Quantité */}
-          <label>
-            Quantité
-            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-              <Layers size={18} color="var(--primary)" />
-              <input
-                type="number"
-                min="1"
-                value={quantity}
-                onChange={(e) => setQuantity(e.target.value)}
-              />
-            </div>
-          </label>
+      <p className="page-subtitle">
+        Gérez vos produits : consommer, gaspiller et suivre leur état.
+      </p>
 
-          {/* Catégorie */}
-          <label>
-            Catégorie
-            <select
-              value={categoryId}
-              onChange={(e) => setCategoryId(e.target.value)}
-            >
-              <option value="">Aucune catégorie</option>
-              {categories.map((c) => (
-                <option key={c.id} value={c.id}>
-                  {c.name}
-                </option>
-              ))}
-            </select>
-          </label>
+      {/* ➕ LIEN AJOUTER PRODUIT → avec Link, plus de onClick */}
+      <p className="page-subtitle">
+        Ajouter un produit{" "}
+        <Link
+          href="/add-product"
+          style={{
+            color: "var(--primary)",
+            cursor: "pointer",
+            textDecoration: "underline",
+            fontWeight: 600,
+          }}
+        >
+          Ajouter
+        </Link>
+      </p>
 
-          {/* Date d'expiration */}
-          <label>
-            Date d'expiration
-            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-              <Calendar size={18} color="var(--primary)" />
-              <input
-                type="date"
-                value={expirationDate}
-                onChange={(e) => setExpirationDate(e.target.value)}
-              />
-            </div>
-          </label>
-
-          {/* Notes */}
-          <label>
-            Notes
-            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-              <Edit3 size={18} color="var(--primary)" />
-              <textarea
-                placeholder="Infos supplémentaires…"
-                value={notes}
-                onChange={(e) => setNotes(e.target.value)}
-              />
-            </div>
-          </label>
-
-          {/* Message */}
-          {msg && (
-            <p
+      {loading ? (
+        <p>Chargement…</p>
+      ) : products.length === 0 ? (
+        <div className="card" style={{ textAlign: "center", padding: 30 }}>
+          <Package size={40} color="#6b7280" />
+          <p style={{ marginTop: 12 }}>
+            Aucun produit.{" "}
+            <Link
+              href="/add-product"
               style={{
-                color: msg.type === "error" ? "#b91c1c" : "green",
+                color: "var(--primary)",
+                cursor: "pointer",
+                textDecoration: "underline",
                 fontWeight: 600,
-                marginTop: 10,
               }}
             >
-              {msg.text}
-            </p>
-          )}
+              Ajouter
+            </Link>
+          </p>
+        </div>
+      ) : (
+        <div
+          style={{
+            display: "grid",
+            gap: 20,
+            gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
+          }}
+        >
+          {products
+            .filter((p) =>
+              selectedCategory === "" ? true : p.category === selectedCategory
+            )
+            .map((p) => (
+              <div
+                key={p.id}
+                className="card"
+                style={{
+                  padding: 20,
+                  minHeight: 260,
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "space-between",
+                }}
+              >
+                <div>
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "flex-start",
+                    }}
+                  >
+                    <h3 style={{ margin: 0 }}>{p.name}</h3>
+                    <Package size={22} color="#4b5563" />
+                  </div>
+                  <div style={{ fontSize: 14, opacity: 0.7 }}>
+                    {p.category ?? "Sans catégorie"}
+                  </div>
+                </div>
 
-          <button type="submit" className="btn" style={{ width: "100%", marginTop: 12 }}>
-            Ajouter le produit
-          </button>
-        </form>
-      </div>
-    </div>
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    fontSize: 14,
+                    marginTop: 15,
+                  }}
+                >
+                  <span>
+                    Quantité : <strong>{p.quantity}</strong>
+                  </span>
+                  <span
+                    style={{ display: "flex", gap: 4, alignItems: "center" }}
+                  >
+                    <Clock size={15} /> {p.days_left} j
+                  </span>
+                </div>
+
+                <div style={{ marginTop: 10 }}>{badge(p.days_left)}</div>
+
+                <div
+                  style={{
+                    display: "flex",
+                    gap: 12,
+                    marginTop: 16,
+                  }}
+                >
+                  <button
+                    className="btn"
+                    style={{
+                      flex: 1,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      gap: 6,
+                    }}
+                    onClick={() => consumeProduct(p.id)}
+                  >
+                    <Utensils size={16} /> Consommer
+                  </button>
+
+                  <button
+                    className="btn"
+                    style={{
+                      flex: 1,
+                      backgroundColor: "#b91c1c",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      gap: 6,
+                    }}
+                    onClick={() => wasteProduct(p.id)}
+                  >
+                    <Trash2 size={16} /> Gaspiller
+                  </button>
+                </div>
+              </div>
+            ))}
+        </div>
+      )}
+    </>
   );
 }
