@@ -1,4 +1,5 @@
 // pages/products.js
+// pages/products.js
 import { useEffect, useState } from "react";
 import { useAuth } from "../contexts/AuthContext";
 import { useRouter } from "next/router";
@@ -11,15 +12,12 @@ import {
   Utensils,
   Trash2,
 } from "lucide-react";
-const router = useRouter();
 
-const API_BASE =
-  process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
-  
 export const ssr = false;
 
 
 export default function ProductsPage() {
+  const router = useRouter(); 
   const { token } = useAuth();
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
