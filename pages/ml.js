@@ -1,12 +1,7 @@
 // pages/ml.js
 import { useEffect, useState } from "react";
 import { useAuth } from "../contexts/AuthContext";
-import {
-  FlaskConical,
-  Cpu,
-  TestTube,
-  Activity,
-} from "lucide-react";
+import { FlaskConical, Cpu, TestTube, Activity } from "lucide-react";
 import Loader from "../components/Loader";
 
 const API_BASE =
@@ -14,32 +9,49 @@ const API_BASE =
 
 export default function MLPage() {
   const { token } = useAuth();
+
   const [products, setProducts] = useState([]);
   const [selectedId, setSelectedId] = useState("");
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  // 🟦 Récupération des produits utilisateur
+  // ===============================
+  // 🔵 Charger les produits
+  // ===============================
   useEffect(() => {
+    if (!token) return;
+
+    let isMounted = true;
+
     const fetchProducts = async () => {
       try {
         const res = await fetch(`${API_BASE}/products/`, {
           headers: { Authorization: `Bearer ${token}` },
         });
-        if (res.ok) {
-          const data = await res.json();
-          setProducts(data || []);
+
+        if (!res.ok) return;
+
+        const data = await res.json();
+        if (isMounted && Array.isArray(data)) {
+          setProducts(data);
         }
       } catch (err) {
         console.error(err);
       }
     };
-    if (token) fetchProducts();
+
+    fetchProducts();
+
+    return () => {
+      isMounted = false;
+    };
   }, [token]);
 
-  // 🟩 Appel du modèle ML
+  // ===============================
+  // 🟢 Appel prédiction ML
+  // ===============================
   const handlePredict = async () => {
-    if (!selectedId) return;
+    if (!selectedId || !token) return;
 
     setLoading(true);
     setResult(null);
@@ -54,15 +66,23 @@ export default function MLPage() {
         body: JSON.stringify({ product_id: selectedId }),
       });
 
+      if (!res.ok) {
+        throw new Error("Erreur serveur");
+      }
+
       const data = await res.json();
       setResult(data);
-    } catch {
-      setResult({ error: "Erreur lors de l'appel au modèle." });
+    } catch (err) {
+      console.error(err);
+      setResult({ error: "Erreur lors de l'appel au modèle ML." });
+    } finally {
+      setLoading(false);
     }
-
-    setLoading(false);
   };
 
+  // ===============================
+  // 🟣 RENDER
+  // ===============================
   return (
     <div className="page">
       <h1
@@ -77,26 +97,33 @@ export default function MLPage() {
       </p>
 
       <div className="card" style={{ maxWidth: 650, margin: "0 auto" }}>
-        {/* Sélecteur de produit */}
+        {/* =========================
+            Sélecteur produit
+        ========================== */}
         <label style={{ fontWeight: 600 }}>
           Produit à analyser
           <div className="input-with-icon">
             <TestTube className="input-icon" size={18} />
+
             <select
               value={selectedId}
               onChange={(e) => setSelectedId(e.target.value)}
             >
               <option value="">Sélectionner un produit…</option>
-              {products.map((p) => (
-                <option key={p.id} value={p.id}>
-                  {p.name} • {p.days_left} jours restants
-                </option>
-              ))}
+
+              {Array.isArray(products) &&
+                products.map((p) => (
+                  <option key={String(p.id)} value={String(p.id)}>
+                    {p.name}
+                  </option>
+                ))}
             </select>
           </div>
         </label>
 
-        {/* 🟧 Bouton prédiction */}
+        {/* =========================
+            Bouton prédiction
+        ========================== */}
         <button
           onClick={handlePredict}
           disabled={!selectedId || loading}
@@ -113,15 +140,17 @@ export default function MLPage() {
           Analyser le produit
         </button>
 
-        {/* 🟪 Résultat */}
-        {result && (
+        {/* =========================
+            Résultat ML (DOM stable)
+        ========================== */}
+        {result !== null && (
           <div
+            key="ml-result"
             className="card"
             style={{
               marginTop: 24,
               background: "#F8FBFF",
               borderLeft: "4px solid var(--primary)",
-              animation: "fadeIn 0.35s ease",
             }}
           >
             <h3 style={{ display: "flex", alignItems: "center", gap: 8 }}>
@@ -143,8 +172,6 @@ export default function MLPage() {
           </div>
         )}
       </div>
-
-     
     </div>
   );
 }
