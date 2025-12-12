@@ -3,7 +3,6 @@ import { createContext, useContext, useEffect, useState } from "react";
 
 const AuthContext = createContext(null);
 
-// URL backend
 const API_BASE =
   process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
@@ -12,65 +11,57 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
 
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-
-  // Indique si les vérifications sont FINIES
   const [authReady, setAuthReady] = useState(false);
 
-  // Charger le token au démarrage
+  // Charger token + le valider AVANT de mettre authReady à true
   useEffect(() => {
-    const stored = localStorage.getItem("fwz_token");
+    async function initAuth() {
+      const stored = localStorage.getItem("fwz_token");
 
-    if (!stored) {
-      setAuthReady(true);
-      return;
-    }
-
-    setToken(stored);
-  }, []);
-
-  // Vérifier le token quand il change
-  useEffect(() => {
-    async function validate() {
-      if (!token) {
-        setUser(null);
+      if (!stored) {
+        // Pas de token → utilisateur NON connecté
         setIsAuthenticated(false);
+        setUser(null);
         setAuthReady(true);
         return;
       }
 
+      // Vérification du token immédiatement
       try {
         const res = await fetch(`${API_BASE}/users/me`, {
-          headers: { Authorization: `Bearer ${token}` },
+          headers: { Authorization: `Bearer ${stored}` },
         });
 
         if (!res.ok) {
-          // Token faux → déconnecter proprement
+          // Token invalide → nettoyer
           localStorage.removeItem("fwz_token");
+          setIsAuthenticated(false);
           setToken(null);
           setUser(null);
-          setIsAuthenticated(false);
           setAuthReady(true);
           return;
         }
 
-        // Token valide → enregistrer user
         const data = await res.json();
+
+        // Token valide
+        setToken(stored);
         setUser(data);
         setIsAuthenticated(true);
         setAuthReady(true);
 
       } catch (err) {
-        console.error("Erreur /me :", err);
+        console.error("Erreur validation token :", err);
         localStorage.removeItem("fwz_token");
+        setIsAuthenticated(false);
         setToken(null);
         setUser(null);
-        setIsAuthenticated(false);
         setAuthReady(true);
       }
     }
 
-    validate();
-  }, [token]);
+    initAuth();
+  }, []);
 
   // LOGIN
   const login = async (email, password) => {
@@ -92,8 +83,18 @@ export function AuthProvider({ children }) {
     const data = await res.json();
     const accessToken = data.access_token;
 
+    // Sauvegarde + validation immédiate
     localStorage.setItem("fwz_token", accessToken);
     setToken(accessToken);
+    setIsAuthenticated(true);
+
+    // Récupérer user
+    const me = await fetch(`${API_BASE}/users/me`, {
+      headers: { Authorization: `Bearer ${accessToken}` },
+    });
+
+    const meData = await me.json();
+    setUser(meData);
 
     return accessToken;
   };
