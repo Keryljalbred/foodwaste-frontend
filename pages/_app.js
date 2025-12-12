@@ -75,22 +75,24 @@ function ProtectedShell({ Component, pageProps }) {
   const { isAuthenticated, authReady } = useAuth();
 
   const publicRoutes = ["/", "/login", "/register"];
-  const currentPath = router.pathname;
-
+  const currentPath = router.asPath.split("?")[0];
   const isPublic = publicRoutes.includes(currentPath);
 
-  // 1️⃣ Ne rien faire tant que authReady = false
+  // 1️⃣ Attendre que AuthContext soit prêt
   if (!authReady) {
-    return <div className="app-shell"><div className="app-main">Chargement...</div></div>;
+    return (
+      <div className="app-shell">
+        <div className="app-main">Chargement...</div>
+      </div>
+    );
   }
 
-  // 2️⃣ Si pas authentifié → redirection uniquement si route privée
+  // 2️⃣ Si non connecté → redirection seulement si route privée
   if (!isAuthenticated && !isPublic) {
     router.replace("/login");
-    return <div className="app-shell"><div className="app-main">Redirection...</div></div>;
+    return null;
   }
 
-  // 3️⃣ Si authentifié → PAS DE REDIRECTION
   return (
     <div className="app-shell">
       <Navbar />
@@ -100,6 +102,7 @@ function ProtectedShell({ Component, pageProps }) {
     </div>
   );
 }
+
 
 function MyApp({ Component, pageProps }) {
   return (
