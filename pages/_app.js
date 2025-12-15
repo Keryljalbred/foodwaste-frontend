@@ -10,18 +10,22 @@ import {
   Settings,
   BarChart2,
   LogOut,
+  Menu,
 } from "lucide-react";
 import { useState } from "react";
 
+/* ======================================================
+   NAVBAR
+====================================================== */
 function Navbar() {
   const router = useRouter();
   const { user, logout, isAuthenticated } = useAuth();
-  const [openMenu] = useState(false); // menu retiré
+  const [openMenu, setOpenMenu] = useState(false);
 
   if (!isAuthenticated) return null;
 
   const links = [
-    { name: "Dashboard", icon: <Home size={18} />, path: "/dashboard" },
+    { name: "Tableau de bord", icon: <Home size={18} />, path: "/dashboard" },
     { name: "Produits", icon: <Package size={18} />, path: "/products" },
     { name: "Recettes", icon: <ChefHat size={18} />, path: "/recipes" },
     { name: "Prédiction", icon: <BrainCircuit size={18} />, path: "/ml" },
@@ -30,56 +34,103 @@ function Navbar() {
   ];
 
   return (
-    <header className="navbar-pro">
-      
-      <div className="nav-left">
-        <div className="brand" onClick={() => router.push("/dashboard")}>
-          FoodWaste Zero
+    <>
+      <header className="navbar-pro">
+        <div className="nav-left">
+          <div className="brand" onClick={() => router.push("/dashboard")}>
+            FoodWaste Zero
+          </div>
+
+          {/* NAV DESKTOP */}
+          <nav className="nav-links">
+            {links.map((link) => (
+              <div
+                key={link.path}
+                className={`nav-item ${
+                  router.pathname === link.path ? "active" : ""
+                }`}
+                onClick={() => router.push(link.path)}
+              >
+                {link.icon}
+                <span>{link.name}</span>
+              </div>
+            ))}
+          </nav>
         </div>
 
-        <nav className="nav-links">
+        <div className="nav-right">
+          {/* 🔴 HAMBURGER MOBILE */}
+          <button
+            className="menu-btn"
+            onClick={() => setOpenMenu(true)}
+            aria-label="Ouvrir le menu"
+          >
+            <Menu />
+          </button>
+
+          <span className="user-label">
+            {user ? user.full_name || user.email : ""}
+          </span>
+
+          <button
+            className="logout-btn"
+            onClick={() => {
+              logout();
+              router.push("/login");
+            }}
+          >
+            <LogOut size={18} />
+          </button>
+        </div>
+      </header>
+
+      {/* ======================================================
+          MENU MOBILE
+      ====================================================== */}
+      {openMenu && (
+        <div className="mobile-menu">
           {links.map((link) => (
             <div
               key={link.path}
-              className={`nav-item ${router.pathname === link.path ? "active" : ""}`}
-              onClick={() => router.push(link.path)}
+              className="mobile-item"
+              onClick={() => {
+                router.push(link.path);
+                setOpenMenu(false);
+              }}
             >
               {link.icon}
               <span>{link.name}</span>
             </div>
           ))}
-        </nav>
-      </div>
 
-      <div className="nav-right">
-        <span className="user-label">
-          {user ? user.full_name || user.email : ""}
-        </span>
-
-        <button
-          className="logout-btn"
-          onClick={() => {
-            logout();
-            router.push("/login");
-          }}
-        >
-          <LogOut size={18} />
-        </button>
-      </div>
-    </header>
+          <div
+            className="mobile-item logout-mobile"
+            onClick={() => {
+              logout();
+              router.push("/login");
+            }}
+          >
+            <LogOut size={18} />
+            <span>Déconnexion</span>
+          </div>
+        </div>
+      )}
+    </>
   );
 }
 
+/* ======================================================
+   SHELL PROTÉGÉ
+====================================================== */
 function ProtectedShell({ Component, pageProps }) {
   const router = useRouter();
   const { isAuthenticated, authReady } = useAuth();
 
-  const publicRoutes = ["/", "/login", "/register", "/add-product"];
+  const publicRoutes = ["/", "/login", "/register"];
 
   const currentPath = router.asPath.split("?")[0];
   const isPublic = publicRoutes.includes(currentPath);
 
-  // Attendre Ready
   if (!authReady) {
     return (
       <div className="app-shell">
@@ -88,7 +139,6 @@ function ProtectedShell({ Component, pageProps }) {
     );
   }
 
-  // Rediriger uniquement si nécessaire
   if (!isAuthenticated && !isPublic) {
     router.replace("/login");
     return null;
@@ -104,6 +154,9 @@ function ProtectedShell({ Component, pageProps }) {
   );
 }
 
+/* ======================================================
+   APP
+====================================================== */
 function MyApp({ Component, pageProps }) {
   return (
     <AuthProvider>
