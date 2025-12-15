@@ -2,12 +2,14 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "../contexts/AuthContext";
 import { useRouter } from "next/router";
+import BarcodeScannerComponent from "react-qr-barcode-scanner";
 import {
   PackagePlus,
   Calendar,
   Edit3,
   Layers,
   NotebookPen,
+  ScanLine,
 } from "lucide-react";
 
 const API_BASE =
@@ -24,6 +26,9 @@ export default function AddProductPage() {
     return <p>Redirection...</p>;
   }
 
+  /* ===============================
+     STATES
+  =============================== */
   const [name, setName] = useState("");
   const [categoryId, setCategoryId] = useState("");
   const [categories, setCategories] = useState([]);
@@ -32,6 +37,10 @@ export default function AddProductPage() {
   const [notes, setNotes] = useState("");
   const [message, setMessage] = useState(null);
   const [dateError, setDateError] = useState("");
+
+  // Scan
+  const [scanMode, setScanMode] = useState(false);
+  const [scanned, setScanned] = useState(false);
 
   /* ===============================
      Charger catégories
@@ -48,6 +57,44 @@ export default function AddProductPage() {
   }, [token]);
 
   /* ===============================
+     Scan code-barres
+  =============================== */
+  const fetchProductByBarcode = async (barcode) => {
+    try {
+      const res = await fetch(`${API_BASE}/barcode/${barcode}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!res.ok) {
+        throw new Error("Produit non trouvé");
+      }
+
+      const data = await res.json();
+
+      if (data.name) setName(data.name);
+      if (data.brand)
+        setNotes((prev) =>
+          prev ? `${prev}\nMarque : ${data.brand}` : `Marque : ${data.brand}`
+        );
+
+      setMessage({
+        type: "success",
+        text: "Produit détecté via le code-barres ✅",
+      });
+
+      setScanMode(false);
+    } catch {
+      setMessage({
+        type: "error",
+        text: "Produit non reconnu via le code-barres.",
+      });
+      setScanMode(false);
+    }
+  };
+
+  /* ===============================
      Soumission formulaire
   =============================== */
   const handleSubmit = async (e) => {
@@ -59,7 +106,6 @@ export default function AddProductPage() {
     if (expirationDate) {
       const selectedDate = new Date(expirationDate);
       const today = new Date();
-
       selectedDate.setHours(0, 0, 0, 0);
       today.setHours(0, 0, 0, 0);
 
@@ -109,7 +155,7 @@ export default function AddProductPage() {
     <div className="page">
       <h1 className="page-title">Ajouter un produit</h1>
       <p className="page-subtitle">
-        Renseignez les informations de votre produit.
+        Ajoutez un produit manuellement ou via scan de code-barres.
       </p>
 
       <div className="card" style={{ maxWidth: 650, margin: "0 auto" }}>
@@ -118,8 +164,36 @@ export default function AddProductPage() {
           <h2>Nouveau produit</h2>
         </div>
 
+        {/* 🔍 SCAN */}
+        <button
+          type="button"
+          className="btn-secondary"
+          style={{ marginBottom: 12 }}
+          onClick={() => {
+            setScanMode(!scanMode);
+            setScanned(false);
+          }}
+        >
+          <ScanLine size={18} /> Scanner un produit
+        </button>
+
+        {scanMode && (
+          <div style={{ marginBottom: 16 }}>
+            <BarcodeScannerComponent
+              width={300}
+              height={300}
+              onUpdate={(err, result) => {
+                if (result && !scanned) {
+                  setScanned(true);
+                  fetchProductByBarcode(result.text);
+                }
+              }}
+            />
+          </div>
+        )}
+
+        {/* FORM */}
         <form onSubmit={handleSubmit}>
-          {/* Nom */}
           <label>
             Nom du produit *
             <input
@@ -129,7 +203,6 @@ export default function AddProductPage() {
             />
           </label>
 
-          {/* Catégorie */}
           <label>
             Catégorie
             <select
@@ -145,7 +218,6 @@ export default function AddProductPage() {
             </select>
           </label>
 
-          {/* Quantité */}
           <label>
             Quantité
             <input
@@ -156,7 +228,6 @@ export default function AddProductPage() {
             />
           </label>
 
-          {/* Date */}
           <label>
             Date de péremption *
             <input
@@ -172,7 +243,6 @@ export default function AddProductPage() {
             <p style={{ color: "#e74c3c", fontWeight: 600 }}>{dateError}</p>
           )}
 
-          {/* Notes */}
           <label>
             Notes
             <textarea
