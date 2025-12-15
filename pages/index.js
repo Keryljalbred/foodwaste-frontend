@@ -3,9 +3,9 @@ import { useRouter } from "next/router";
 import { useAuth } from "../contexts/AuthContext";
 import {
   Leaf,
-  ShieldCheck,
-  BarChart3,
   BellRing,
+  BarChart3,
+  ShieldCheck,
   Cpu,
 } from "lucide-react";
 
@@ -16,22 +16,22 @@ export default function HomePage() {
   return (
     <div className="landing">
 
-      {/* ================= HERO ================= */}
+      {/* ================= HERO FULL PAGE ================= */}
       <section className="hero">
         <div className="overlay" />
 
-        <div className="hero-content">
-          <span className="badge">🌱 Plateforme intelligente anti-gaspillage</span>
+        <div className="hero-content animate">
+          <span className="badge">🌍 Agir contre le gaspillage alimentaire</span>
 
           <h1>
-            Réduisez le <span>gaspillage alimentaire</span><br />
-            grâce à la <strong>data</strong> et à l’<strong>IA</strong>
+            Chaque aliment gaspillé<br />
+            est une <span>ressource perdue</span>
           </h1>
 
           <p>
-            FoodWaste Zero vous aide à suivre vos produits, anticiper les risques
-            de péremption et adopter une consommation plus responsable,
-            simplement et efficacement.
+            FoodWaste Zero est une plateforme intelligente qui vous aide à
+            anticiper, analyser et réduire le gaspillage alimentaire grâce
+            à la data et à l’intelligence artificielle.
           </p>
 
           <div className="cta">
@@ -58,105 +58,84 @@ export default function HomePage() {
 
       {/* ================= FEATURES ================= */}
       <section className="features">
-        <h2>Une solution complète, pensée pour votre foyer</h2>
+        <h2 className="animate">Une solution concrète et intelligente</h2>
 
         <div className="features-grid">
-          <div className="feature-card">
-            <Leaf size={36} />
-            <h3>Suivi intelligent</h3>
-            <p>
-              Centralisez vos produits, visualisez leur état et évitez les pertes
-              inutiles au quotidien.
-            </p>
-          </div>
-
-          <div className="feature-card">
-            <BellRing size={36} />
-            <h3>Alertes prédictives</h3>
-            <p>
-              Notifications avant péremption et priorisation automatique des
-              produits à consommer.
-            </p>
-          </div>
-
-          <div className="feature-card">
-            <Cpu size={36} />
-            <h3>Modèle ML intégré</h3>
-            <p>
-              Un modèle de prédiction analyse le risque de gaspillage à partir
-              de vos données.
-            </p>
-          </div>
-
-          <div className="feature-card">
-            <BarChart3 size={36} />
-            <h3>Statistiques avancées</h3>
-            <p>
-              Visualisez votre impact, vos habitudes et votre taux de gaspillage
-              réel.
-            </p>
-          </div>
-
-          <div className="feature-card">
-            <ShieldCheck size={36} />
-            <h3>Données sécurisées</h3>
-            <p>
-              Vos données restent privées, chiffrées et strictement liées à votre
-              foyer.
-            </p>
-          </div>
+          <Feature
+            icon={<Leaf size={34} />}
+            title="Impact écologique"
+            text="Réduisez votre empreinte environnementale au quotidien."
+          />
+          <Feature
+            icon={<BellRing size={34} />}
+            title="Alertes intelligentes"
+            text="Anticipez la péremption avant qu’il ne soit trop tard."
+          />
+          <Feature
+            icon={<Cpu size={34} />}
+            title="Modèle prédictif"
+            text="Analyse ML pour identifier les produits à risque."
+          />
+          <Feature
+            icon={<BarChart3 size={34} />}
+            title="Statistiques claires"
+            text="Visualisez votre gaspillage réel et son évolution."
+          />
+          <Feature
+            icon={<ShieldCheck size={34} />}
+            title="Données sécurisées"
+            text="Vos données restent privées et protégées."
+          />
         </div>
       </section>
 
       {/* ================= FINAL CTA ================= */}
-      <section className="final-cta">
+      <section className="final-cta animate">
         <h2>
-          Reprenez le contrôle de votre alimentation,<br />
-          dès aujourd’hui.
+          Ensemble, faisons du <span>zéro gaspillage</span><br />
+          une réalité.
         </h2>
 
         <button
           className="btn-primary"
           onClick={() => router.push("/register")}
         >
-          Créer mon compte gratuitement
+          Créer un compte gratuitement
         </button>
       </section>
 
       {/* ================= STYLES ================= */}
       <style jsx>{`
         .landing {
-          animation: fadeIn 0.6s ease;
+          overflow-x: hidden;
         }
 
-        /* ---------- HERO ---------- */
+        /* HERO */
         .hero {
           position: relative;
-          min-height: 92vh;
+          min-height: 100vh;
           display: flex;
           align-items: center;
-          padding: 0 24px;
-          background-image: url("https://images.unsplash.com/photo-1506806732259-39c2d0268443?q=80&w=2000");
+          padding: 0 20px;
+          background-image: url("https://images.unsplash.com/photo-1601050690597-df0568f70950?q=80&w=2000");
           background-size: cover;
           background-position: center;
-          background-attachment: fixed;
         }
 
         .overlay {
           position: absolute;
           inset: 0;
           background: linear-gradient(
-            rgba(0, 0, 0, 0.55),
-            rgba(0, 0, 0, 0.65)
+            rgba(0, 0, 0, 0.65),
+            rgba(0, 0, 0, 0.75)
           );
         }
 
         .hero-content {
           position: relative;
-          max-width: 720px;
+          max-width: 760px;
           color: white;
           z-index: 1;
-          animation: slideUp 0.8s ease;
         }
 
         .badge {
@@ -165,13 +144,13 @@ export default function HomePage() {
           padding: 6px 14px;
           border-radius: 999px;
           font-size: 13px;
-          margin-bottom: 18px;
+          margin-bottom: 16px;
         }
 
         h1 {
-          font-size: 46px;
-          line-height: 1.15;
-          margin-bottom: 18px;
+          font-size: 44px;
+          line-height: 1.2;
+          margin-bottom: 16px;
         }
 
         h1 span {
@@ -182,7 +161,7 @@ export default function HomePage() {
           font-size: 18px;
           opacity: 0.9;
           margin-bottom: 30px;
-          max-width: 600px;
+          max-width: 620px;
         }
 
         .cta {
@@ -194,18 +173,11 @@ export default function HomePage() {
         .btn-primary {
           background: var(--primary);
           color: white;
-          border: none;
           padding: 14px 26px;
           border-radius: 14px;
-          font-size: 15px;
+          border: none;
           font-weight: 600;
           cursor: pointer;
-          transition: transform 0.2s ease, box-shadow 0.2s ease;
-        }
-
-        .btn-primary:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
         }
 
         .btn-secondary {
@@ -218,75 +190,50 @@ export default function HomePage() {
           cursor: pointer;
         }
 
-        .btn-secondary:hover {
-          background: white;
-          color: #111;
-        }
-
-        /* ---------- FEATURES ---------- */
+        /* FEATURES */
         .features {
-          padding: 80px 24px;
+          padding: 80px 20px;
           max-width: 1200px;
           margin: 0 auto;
           text-align: center;
         }
 
-        .features h2 {
-          font-size: 30px;
-          margin-bottom: 40px;
-        }
-
         .features-grid {
           display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+          grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
           gap: 24px;
+          margin-top: 40px;
         }
 
         .feature-card {
           background: white;
-          padding: 28px 24px;
+          padding: 26px;
           border-radius: 18px;
-          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
-          transition: transform 0.25s ease;
+          box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+          transition: transform 0.3s ease;
         }
 
         .feature-card:hover {
           transform: translateY(-6px);
         }
 
-        .feature-card h3 {
-          margin-top: 14px;
-          margin-bottom: 8px;
-        }
-
-        .feature-card p {
-          font-size: 14px;
-          opacity: 0.8;
-        }
-
-        /* ---------- FINAL CTA ---------- */
+        /* FINAL CTA */
         .final-cta {
-          padding: 90px 24px;
+          padding: 90px 20px;
           text-align: center;
           background: linear-gradient(135deg, #e0fff1, #ffffff);
         }
 
-        .final-cta h2 {
-          font-size: 32px;
-          margin-bottom: 28px;
+        .final-cta span {
+          color: var(--primary);
         }
 
-        /* ---------- ANIMATIONS ---------- */
-        @keyframes fadeIn {
-          from {
-            opacity: 0;
-          }
-          to {
-            opacity: 1;
-          }
+        /* ANIMATIONS — MOBILE FRIENDLY */
+        .animate {
+          animation: fadeUp 0.8s ease both;
         }
 
-        @keyframes slideUp {
+        @keyframes fadeUp {
           from {
             opacity: 0;
             transform: translateY(20px);
@@ -299,7 +246,7 @@ export default function HomePage() {
 
         @media (max-width: 768px) {
           h1 {
-            font-size: 34px;
+            font-size: 32px;
           }
 
           p {
@@ -307,6 +254,17 @@ export default function HomePage() {
           }
         }
       `}</style>
+    </div>
+  );
+}
+
+/* FEATURE COMPONENT */
+function Feature({ icon, title, text }) {
+  return (
+    <div className="feature-card animate">
+      {icon}
+      <h3>{title}</h3>
+      <p>{text}</p>
     </div>
   );
 }
