@@ -7,8 +7,8 @@ export default function LoginPage() {
   const router = useRouter();
   const { login, isAuthenticated } = useAuth();
 
-  const [email, setEmail] = useState("kiki@example.com");
-  const [password, setPassword] = useState("motdepasse123");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [error, setError] = useState("");
 
   // 🔥 IMPORTANT : la redirection NE DOIT PAS être dans le rendu
