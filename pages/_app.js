@@ -29,6 +29,7 @@ function Navbar() {
     { name: "Produits", icon: <Package size={18} />, path: "/products" },
     { name: "Recettes", icon: <ChefHat size={18} />, path: "/recipes" },
     { name: "Prédiction", icon: <BrainCircuit size={18} />, path: "/ml" },
+    { name: "Faire un don", icon: <HeartHandshake size={18} />, path: "/donate" },
     { name: "Statistiques", icon: <BarChart2 size={18} />, path: "/statistics" },
     { name: "Paramètres", icon: <Settings size={18} />, path: "/settings" },
   ];
