@@ -9,7 +9,6 @@ import {
   CheckCircle2,
   ShieldCheck,
   Save,
-  Settings,
 } from "lucide-react";
 
 const API_BASE =
@@ -26,9 +25,7 @@ export default function SettingsPage() {
   const [message, setMessage] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  /* ===============================
-     LOAD USER
-  =============================== */
+  // Charger les infos utilisateur
   useEffect(() => {
     if (user) {
       setFullName(user.full_name || "");
@@ -37,9 +34,6 @@ export default function SettingsPage() {
     }
   }, [user]);
 
-  /* ===============================
-     SAVE
-  =============================== */
   const handleSave = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -49,7 +43,7 @@ export default function SettingsPage() {
       email,
       full_name: fullName,
       household_size: Number(householdSize),
-      password: password || undefined,
+      password: password || undefined, // facultatif
     };
 
     try {
@@ -74,7 +68,7 @@ export default function SettingsPage() {
       } else {
         setMessage({
           type: "error",
-          text: data.detail || "Erreur lors de la mise à jour.",
+          text: data.detail || "Erreur inconnue.",
         });
       }
     } catch {
@@ -89,30 +83,39 @@ export default function SettingsPage() {
 
   return (
     <div className="page">
-      {/* HEADER */}
-      <div className="settings-header">
-        <div>
-          <h1 className="page-title">Paramètres</h1>
-          <p className="page-subtitle">
-            Gérez votre profil, votre foyer et la sécurité de votre compte.
-          </p>
-        </div>
-        <Settings size={42} className="icon-soft" />
-      </div>
+      <h1 className="page-title">Paramètres du compte</h1>
+      <p className="page-subtitle">
+        Gérez vos informations personnelles, votre foyer et la sécurité de votre compte.
+      </p>
 
-      <div className="card settings-card">
-        <form onSubmit={handleSave} className="settings-form">
-          {/* PROFIL */}
-          <section className="settings-section">
-            <h3>
+      <div
+        className="card"
+        style={{ maxWidth: 700, margin: "0 auto", padding: "24px 22px" }}
+      >
+        <form
+          onSubmit={handleSave}
+          style={{ display: "flex", flexDirection: "column", gap: 20 }}
+        >
+          {/* SECTION - IDENTITÉ */}
+          <section>
+            <h3
+              style={{
+                margin: "0 0 12px 0",
+                fontSize: 18,
+                display: "flex",
+                alignItems: "center",
+                gap: 8,
+              }}
+            >
               <User size={20} /> Profil
             </h3>
 
-            <label className="field">
-              <span>Nom complet</span>
-              <div className="field-input">
-                <User size={18} />
+            <label>
+              Nom complet *
+              <div className="input-with-icon">
+                <User className="input-icon" size={18} />
                 <input
+                  type="text"
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
                   required
@@ -120,10 +123,10 @@ export default function SettingsPage() {
               </div>
             </label>
 
-            <label className="field">
-              <span>Adresse e-mail</span>
-              <div className="field-input">
-                <Mail size={18} />
+            <label>
+              Adresse e-mail *
+              <div className="input-with-icon">
+                <Mail className="input-icon" size={18} />
                 <input
                   type="email"
                   value={email}
@@ -134,16 +137,24 @@ export default function SettingsPage() {
             </label>
           </section>
 
-          {/* FOYER */}
-          <section className="settings-section">
-            <h3>
-              <Users size={20} /> Foyer
+          {/* SECTION - FOYER */}
+          <section>
+            <h3
+              style={{
+                margin: "0 0 12px 0",
+                fontSize: 18,
+                display: "flex",
+                alignItems: "center",
+                gap: 8,
+              }}
+            >
+              <Users size={20} /> Taille du foyer
             </h3>
 
-            <label className="field">
-              <span>Nombre de personnes</span>
-              <div className="field-input">
-                <Users size={18} />
+            <label>
+              Nombre de personnes *
+              <div className="input-with-icon">
+                <Users className="input-icon" size={18} />
                 <input
                   type="number"
                   min={1}
@@ -154,16 +165,24 @@ export default function SettingsPage() {
             </label>
           </section>
 
-          {/* SÉCURITÉ */}
-          <section className="settings-section">
-            <h3>
+          {/* SECTION - SÉCURITÉ */}
+          <section>
+            <h3
+              style={{
+                margin: "0 0 12px 0",
+                fontSize: 18,
+                display: "flex",
+                alignItems: "center",
+                gap: 8,
+              }}
+            >
               <ShieldCheck size={20} /> Sécurité
             </h3>
 
-            <label className="field">
-              <span>Nouveau mot de passe</span>
-              <div className="field-input">
-                <Lock size={18} />
+            <label>
+              Nouveau mot de passe (optionnel)
+              <div className="input-with-icon">
+                <Lock className="input-icon" size={18} />
                 <input
                   type="password"
                   placeholder="Laissez vide pour ne rien changer"
@@ -174,12 +193,22 @@ export default function SettingsPage() {
             </label>
           </section>
 
-          {/* MESSAGE */}
+          {/* MESSAGE FEEDBACK */}
           {message && (
             <div
-              className={`settings-message ${
-                message.type === "success" ? "success" : "error"
-              }`}
+              style={{
+                borderRadius: 10,
+                padding: "10px 12px",
+                fontWeight: 600,
+                backgroundColor:
+                  message.type === "success" ? "#ECFDF3" : "#FEE2E2",
+                color:
+                  message.type === "success" ? "#166534" : "#B91C1C",
+                display: "flex",
+                alignItems: "center",
+                gap: 10,
+                marginTop: 8,
+              }}
             >
               {message.type === "success" ? (
                 <CheckCircle2 size={18} />
@@ -190,18 +219,43 @@ export default function SettingsPage() {
             </div>
           )}
 
-          {/* SAVE */}
+          {/* BOUTON ENREGISTRER */}
           <button
+            disabled={loading}
             className="btn"
             type="submit"
-            disabled={loading}
-            style={{ marginTop: 10 }}
+            style={{
+              alignSelf: "flex-start",
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 8,
+              marginTop: 10,
+            }}
           >
             <Save size={18} />
             {loading ? "Enregistrement…" : "Enregistrer les modifications"}
           </button>
         </form>
       </div>
+
+      {/* STYLES LOCAUX POUR LES INPUTS AVEC ICÔNES */}
+      <style jsx>{`
+        .input-with-icon {
+          position: relative;
+        }
+
+        .input-icon {
+          position: absolute;
+          left: 10px;
+          top: 50%;
+          transform: translateY(-50%);
+          opacity: 0.55;
+        }
+
+        .input-with-icon input {
+          padding-left: 36px !important;
+        }
+      `}</style>
     </div>
   );
 }
