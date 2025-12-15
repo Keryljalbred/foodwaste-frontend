@@ -70,7 +70,12 @@ export default function RecipesPage() {
       </div>
 
       {/* Contenu */}
-      {loading && <p>Chargement des recettes…</p>}
+      {loading && (
+        <div className="info-card">
+          <Sparkles size={18} />
+          Recherche de recettes inspirantes…
+        </div>
+      )}
 
       {!loading && selectedProduct && recipes.length === 0 && (
         <p style={{ marginTop: 20 }}>Aucune recette trouvée pour ce produit.</p>
