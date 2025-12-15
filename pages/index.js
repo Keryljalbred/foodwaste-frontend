@@ -21,17 +21,16 @@ export default function HomePage() {
         <div className="overlay" />
 
         <div className="hero-content animate">
-          <span className="badge">🌍 Agir contre le gaspillage alimentaire</span>
+          <span className="badge">♻️ Le gaspillage alimentaire est un vrai problème</span>
 
           <h1>
-            Chaque aliment gaspillé<br />
-            est une <span>ressource perdue</span>
+            Des tonnes d’aliments<br />
+            <span>finissent à la poubelle</span>
           </h1>
 
           <p>
-            FoodWaste Zero est une plateforme intelligente qui vous aide à
-            anticiper, analyser et réduire le gaspillage alimentaire grâce
-            à la data et à l’intelligence artificielle.
+            FoodWaste Zero aide les foyers à identifier, anticiper et réduire
+            le gaspillage alimentaire grâce à la data et à l’intelligence artificielle.
           </p>
 
           <div className="cta">
@@ -41,7 +40,7 @@ export default function HomePage() {
                 router.push(isAuthenticated ? "/dashboard" : "/register")
               }
             >
-              Commencer maintenant
+              Agir maintenant
             </button>
 
             {!isAuthenticated && (
@@ -58,33 +57,33 @@ export default function HomePage() {
 
       {/* ================= FEATURES ================= */}
       <section className="features">
-        <h2 className="animate">Une solution concrète et intelligente</h2>
+        <h2 className="animate">Transformer un problème réel en solution intelligente</h2>
 
         <div className="features-grid">
           <Feature
             icon={<Leaf size={34} />}
-            title="Impact écologique"
-            text="Réduisez votre empreinte environnementale au quotidien."
+            title="Réduction du gaspillage"
+            text="Identifiez les produits à consommer en priorité."
           />
           <Feature
             icon={<BellRing size={34} />}
-            title="Alertes intelligentes"
+            title="Alertes prédictives"
             text="Anticipez la péremption avant qu’il ne soit trop tard."
           />
           <Feature
             icon={<Cpu size={34} />}
-            title="Modèle prédictif"
-            text="Analyse ML pour identifier les produits à risque."
+            title="Modèle intelligent"
+            text="Analyse basée sur les données et règles prédictives."
           />
           <Feature
             icon={<BarChart3 size={34} />}
-            title="Statistiques claires"
-            text="Visualisez votre gaspillage réel et son évolution."
+            title="Impact mesurable"
+            text="Visualisez votre gaspillage et son évolution."
           />
           <Feature
             icon={<ShieldCheck size={34} />}
-            title="Données sécurisées"
-            text="Vos données restent privées et protégées."
+            title="Données protégées"
+            text="Vos données restent strictement privées."
           />
         </div>
       </section>
@@ -92,8 +91,8 @@ export default function HomePage() {
       {/* ================= FINAL CTA ================= */}
       <section className="final-cta animate">
         <h2>
-          Ensemble, faisons du <span>zéro gaspillage</span><br />
-          une réalité.
+          Chaque produit sauvé<br />
+          est une <span>victoire contre le gaspillage</span>
         </h2>
 
         <button
@@ -110,14 +109,13 @@ export default function HomePage() {
           overflow-x: hidden;
         }
 
-        /* HERO */
         .hero {
           position: relative;
           min-height: 100vh;
           display: flex;
           align-items: center;
           padding: 0 20px;
-          background-image: url("https://images.unsplash.com/photo-1601050690597-df0568f70950?q=80&w=2000");
+          background-image: url("https://images.unsplash.com/photo-1590080877777-5c2d7d63f0c9?q=80&w=2000");
           background-size: cover;
           background-position: center;
         }
@@ -126,8 +124,8 @@ export default function HomePage() {
           position: absolute;
           inset: 0;
           background: linear-gradient(
-            rgba(0, 0, 0, 0.65),
-            rgba(0, 0, 0, 0.75)
+            rgba(0, 0, 0, 0.7),
+            rgba(0, 60, 40, 0.75)
           );
         }
 
@@ -149,7 +147,7 @@ export default function HomePage() {
 
         h1 {
           font-size: 44px;
-          line-height: 1.2;
+          line-height: 1.15;
           margin-bottom: 16px;
         }
 
@@ -159,7 +157,7 @@ export default function HomePage() {
 
         p {
           font-size: 18px;
-          opacity: 0.9;
+          opacity: 0.92;
           margin-bottom: 30px;
           max-width: 620px;
         }
@@ -173,7 +171,7 @@ export default function HomePage() {
         .btn-primary {
           background: var(--primary);
           color: white;
-          padding: 14px 26px;
+          padding: 14px 28px;
           border-radius: 14px;
           border: none;
           font-weight: 600;
@@ -184,13 +182,12 @@ export default function HomePage() {
           background: transparent;
           border: 2px solid white;
           color: white;
-          padding: 14px 26px;
+          padding: 14px 28px;
           border-radius: 14px;
           font-weight: 600;
           cursor: pointer;
         }
 
-        /* FEATURES */
         .features {
           padding: 80px 20px;
           max-width: 1200px;
@@ -217,7 +214,6 @@ export default function HomePage() {
           transform: translateY(-6px);
         }
 
-        /* FINAL CTA */
         .final-cta {
           padding: 90px 20px;
           text-align: center;
@@ -228,7 +224,6 @@ export default function HomePage() {
           color: var(--primary);
         }
 
-        /* ANIMATIONS — MOBILE FRIENDLY */
         .animate {
           animation: fadeUp 0.8s ease both;
         }
@@ -258,7 +253,6 @@ export default function HomePage() {
   );
 }
 
-/* FEATURE COMPONENT */
 function Feature({ icon, title, text }) {
   return (
     <div className="feature-card animate">
