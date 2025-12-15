@@ -1,6 +1,12 @@
 // pages/recipes.js
 import { useAuth } from "../contexts/AuthContext";
 import { useEffect, useState } from "react";
+import {
+  ChefHat,
+  Sparkles,
+  ExternalLink,
+  UtensilsCrossed,
+} from "lucide-react"
 
 const API_BASE =
   process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
