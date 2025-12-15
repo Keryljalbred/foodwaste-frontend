@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "../contexts/AuthContext";
 import { useRouter } from "next/router";
+import { Mail, Lock, LogIn } from "lucide-react";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -10,67 +11,89 @@ export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  // 🔥 IMPORTANT : la redirection NE DOIT PAS être dans le rendu
+  /* ===============================
+     REDIRECTION
+  =============================== */
   useEffect(() => {
     if (isAuthenticated) {
       router.replace("/dashboard");
     }
   }, [isAuthenticated, router]);
 
+  /* ===============================
+     SUBMIT
+  =============================== */
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
+    setLoading(true);
 
     try {
       await login(email, password);
-      // 🔥 NE RIEN METTRE ICI : redirection gérée par useEffect
     } catch (err) {
-      console.log("Erreur login:", err);
       setError(err?.detail || "Identifiants invalides");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="card" style={{ maxWidth: 420, margin: "80px auto" }}>
-      <h1 className="page-title">Connexion</h1>
+    <div className="auth-page">
+      <div className="card auth-card">
+        {/* HEADER */}
+        <div className="auth-header">
+          <LogIn size={34} className="icon-animated" />
+          <h1 className="page-title">Connexion</h1>
+          <p className="page-subtitle">
+            Accédez à votre espace FoodWaste Zero
+          </p>
+        </div>
 
-      <form onSubmit={handleSubmit}>
-        <label>
-          E-mail
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-          />
-        </label>
+        {/* FORM */}
+        <form onSubmit={handleSubmit} className="auth-form">
+          <label className="field">
+            <span className="field-label">Adresse e-mail</span>
+            <div className="field-input">
+              <Mail size={18} />
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="exemple@email.com"
+                required
+              />
+            </div>
+          </label>
 
-        <label>
-          Mot de passe
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
-        </label>
+          <label className="field">
+            <span className="field-label">Mot de passe</span>
+            <div className="field-input">
+              <Lock size={18} />
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="••••••••"
+                required
+              />
+            </div>
+          </label>
 
-        {error && (
-          <p style={{ color: "red", fontSize: 14 }}>{error}</p>
-        )}
+          {error && <p className="error-text">{error}</p>}
 
-        <button className="btn" type="submit">
-          Se connecter
-        </button>
-      </form>
+          <button className="btn auth-btn" type="submit" disabled={loading}>
+            {loading ? "Connexion…" : "Se connecter"}
+          </button>
+        </form>
 
-      <p style={{ marginTop: 12 }}>
-        Pas encore de compte ?{" "}
-        <a href="/register" style={{ color: "var(--primary)" }}>
-          Créer un compte
-        </a>
-      </p>
+        {/* FOOTER */}
+        <div className="auth-footer">
+          <span>Pas encore de compte ?</span>
+          <a href="/register">Créer un compte</a>
+        </div>
+      </div>
     </div>
   );
 }

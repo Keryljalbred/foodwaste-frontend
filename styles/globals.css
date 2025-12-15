@@ -77,7 +77,6 @@ body {
 
 .navbar-pro {
   width: 100%;
-  max-width: 100%;
   background: white;
   padding: 14px 24px;
   display: flex;
@@ -87,7 +86,6 @@ body {
   position: sticky;
   top: 0;
   z-index: 1000;
-  overflow-x: hidden;
 }
 
 .brand {
@@ -118,7 +116,6 @@ body {
   padding-bottom: 4px;
   border-bottom: 2px solid transparent;
   transition: all 0.2s ease;
-  color: #003b24;
 }
 
 .nav-item:hover {
@@ -154,7 +151,7 @@ body {
 }
 
 /* ===================================================================
-   MOBILE NAVIGATION
+   MENU MOBILE
 =================================================================== */
 
 .menu-btn {
@@ -162,6 +159,18 @@ body {
   background: none;
   border: none;
   cursor: pointer;
+  padding: 6px;
+  border-radius: 8px;
+}
+
+.menu-btn:hover {
+  background: rgba(5, 166, 107, 0.08);
+}
+
+.menu-btn svg {
+  width: 26px;
+  height: 26px;
+  color: var(--primary);
 }
 
 .mobile-menu {
@@ -169,7 +178,6 @@ body {
   top: 0;
   right: 0;
   width: 70%;
-  max-width: 100vw;
   height: 100%;
   background: white;
   box-shadow: -4px 0 20px rgba(0, 0, 0, 0.15);
@@ -179,7 +187,6 @@ body {
   gap: 18px;
   animation: slideIn 0.3s ease forwards;
   z-index: 2000;
-  overflow-y: auto;
 }
 
 @keyframes slideIn {
@@ -210,7 +217,7 @@ body {
   }
 
   .menu-btn {
-    display: block;
+    display: flex;
   }
 
   .navbar-pro {
@@ -250,7 +257,7 @@ body {
 }
 
 /* ===================================================================
-   CARDS
+   CARDS (ANIMATIONS PREMIUM)
 =================================================================== */
 
 .card {
@@ -261,6 +268,12 @@ body {
   border: 1px solid #e5e7eb;
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06);
   width: 100%;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
 }
 
 /* ===================================================================
@@ -271,7 +284,6 @@ input,
 select,
 textarea {
   width: 100%;
-  max-width: 100%;
   padding: 9px 11px;
   margin-top: 4px;
   margin-bottom: 12px;
@@ -279,7 +291,6 @@ textarea {
   border: 1px solid #cfe8dd;
   font-size: 14px;
   transition: all 0.2s ease;
-  background: white;
 }
 
 input:focus,
@@ -291,8 +302,14 @@ textarea:focus {
 }
 
 /* ===================================================================
-   TITLES
+   TITRES & LIENS
 =================================================================== */
+
+h1,
+h2,
+h3 {
+  color: #023020;
+}
 
 .page-title {
   font-size: 26px;
@@ -306,8 +323,28 @@ textarea:focus {
   margin-bottom: 18px;
 }
 
+a {
+  color: var(--primary);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+/* Mobile typography */
+@media (max-width: 480px) {
+  .page-title {
+    font-size: 22px;
+  }
+
+  .page-subtitle {
+    font-size: 13px;
+  }
+}
+
 /* ===================================================================
-   DASHBOARD RESPONSIVE
+   DASHBOARD
 =================================================================== */
 
 .dashboard-two-columns {
@@ -324,13 +361,12 @@ textarea:focus {
 }
 
 /* ===================================================================
-   TABLES — SCROLL INTERNE
+   TABLES
 =================================================================== */
 
 .table-wrapper {
   width: 100%;
   overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
 }
 
 .table {
@@ -346,7 +382,6 @@ textarea:focus {
 }
 
 .table th {
-  text-align: left;
   font-size: 12px;
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -360,35 +395,8 @@ textarea:focus {
 .priority-scroll {
   width: 100%;
   overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
 }
 
 .priority-inner {
   width: 100%;
-}
-/* ===================================================================
-   BOUTON MENU MOBILE (3 POINTS / HAMBURGER)
-=================================================================== */
-
-.menu-btn {
-  display: none;
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 6px;
-}
-
-.menu-btn svg {
-  width: 26px;
-  height: 26px;
-  color: var(--primary);
-}
-
-/* Affichage du bouton sur mobile */
-@media (max-width: 780px) {
-  .menu-btn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
 }
