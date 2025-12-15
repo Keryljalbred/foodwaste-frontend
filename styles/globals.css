@@ -366,3 +366,29 @@ textarea:focus {
 .priority-inner {
   width: 100%;
 }
+/* ===================================================================
+   BOUTON MENU MOBILE (3 POINTS / HAMBURGER)
+=================================================================== */
+
+.menu-btn {
+  display: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 6px;
+}
+
+.menu-btn svg {
+  width: 26px;
+  height: 26px;
+  color: var(--primary);
+}
+
+/* Affichage du bouton sur mobile */
+@media (max-width: 780px) {
+  .menu-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+}
