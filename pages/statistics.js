@@ -270,3 +270,25 @@ export default function Statistics() {
     </div>
   );
 }
+function StatCard({ title, value, icon }) {
+  return (
+    <div className="stats-card">
+      {icon}
+      <div>
+        <h3>{title}</h3>
+        <p>{value}</p>
+      </div>
+    </div>
+  );
+}
+
+function ChartBlock({ title, icon, children }) {
+  return (
+    <div className="chart-block">
+      <h2 style={{ display: "flex", gap: 8 }}>
+        {icon} {title}
+      </h2>
+      {children}
+    </div>
+  );
+}
