@@ -129,7 +129,7 @@ export default function AddProductPage() {
 
       if (!res.ok) throw new Error();
 
-      setMessage({ type: "success", text: "Produit ajouté avec succès 🎉" });
+      setMessage({ type: "success", text: "Produit ajouté avec succès ✅" });
       setName("");
       setCategoryId("");
       setQuantity(1);

@@ -74,7 +74,7 @@ export default function DashboardPage() {
       return <span style={badgeStyle("#c05621", "#fff7ed")}>URGENT</span>;
     if (daysLeft <= 3)
       return <span style={badgeStyle("#d97706", "#fffbeb")}>À SURVEILLER</span>;
-    return <span style={badgeStyle("#166534", "#dcfce7")}>OK</span>;
+    return <span style={badgeStyle("#166534", "#dcfce7")}>SÛR</span>;
   };
 
   const badgeStyle = (color, bg) => ({
