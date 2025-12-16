@@ -11,8 +11,11 @@ import {
   Cell,
   XAxis,
   YAxis,
+  LineChart,
+  Line,
+  CartesianGrid,
 } from "recharts";
-import { BarChart2, PieChart as PieIcon, TrendingDown, TrendingUp, Layers } from "lucide-react";
+import { BarChart2, PieChart as PieIcon, TrendingDown, TrendingUp, Layers,  Calendar, } from "lucide-react";
 
 const API_BASE =
   process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
@@ -21,13 +24,17 @@ export default function Statistics() {
   const { token } = useAuth();
   const [stats, setStats] = useState(null);
   const [error, setError] = useState(null);
+  const [month, setMonth] = useState(
+
+    new Date().toISOString().slice(0, 7)
+  );
 
   const COLORS = ["#05A66B", "#E74C3C", "#3498DB"]; // Consommés, Gaspillés, Expirés
 
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const res = await fetch(`${API_BASE}/stats/overview`, {
+        const res = await fetch(`${API_BASE}/stats/overview?month=${month}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
 
@@ -43,8 +50,8 @@ export default function Statistics() {
       }
     };
 
-    fetchStats();
-  }, [token]);
+    if (token) fetchStats();
+  }, [token, month]);
 
   if (!stats) return <p>Chargement des statistiques...</p>;
 
